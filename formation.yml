@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification for shipping CloudWatch logs to Logentries.
+Resources:
+
+  # A generic Lambda role that allows execution and Cloud Watch logs.
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+
+  # The Lambda that will do the shipping to Logentries.
+  LogentriesShipperLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: main
+      Runtime: go1.x
+      CodeUri: deployment.zip
+      Description: 'Ship CloudWatch logs to syslog-ng.'
+      MemorySize: 128
+      Timeout: 60
+      Role: !GetAtt LambdaRole.Arn
