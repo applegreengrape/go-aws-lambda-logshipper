@@ -1,14 +1,14 @@
 # go-aws-lambda-logshipper
-shipping aws cloudwatch log stream to your log collector endpoint (over tcp)
+## shipping aws cloudwatch log stream to your log collector endpoint (over tcp)
 
-# Variable.
-bucket=<NAME-OF-S3-BUCKET>
+## Variable.
+bucket=NAME-OF-S3-BUCKET
 
-# Create binary that we told Lambda to use as the handler (via Cloud Formation).
+## Create binary that we told Lambda to use as the handler (via Cloud Formation).
 GOOS=linux go build -o main main.go
 zip deployment.zip main
 
-# Trigger a Cloud Formation update to update the infrastructure and the deployed code.
+## Trigger a Cloud Formation update to update the infrastructure and the deployed code.
 aws s3 mb s3://$(bucket)
 aws cloudformation package \
     --template-file formation.yml \
