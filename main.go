@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"log"
 	"net"
 	"encoding/json"
@@ -37,17 +38,20 @@ func Handler(request events.CloudwatchLogsEvent) error {
 
 	fmt.Println("cloudwatchLogsData.LogEvents:", cloudwatchLogsData.LogEvents)
 
+	// Remove the prefix to get to the name of the Lambda.
+	logGroup := strings.Replace(cloudwatchLogsData.LogGroup, "/aws/lambda/", "", 1)
+
 	// What you want to capture is up to you. BUT, for example:
 	type LogEntry struct {
-	//	LogGroup  string `json:"log_group"`
+		LogGroup  string `json:"log_group"`
 		Timestamp int64  `json:"timestamp"`
 		Message   string `json:"message"`
 	}
 
 	// Stuff the incoming log lines into the datastructure to serialize to Log Entries.
 	for _, event := range cloudwatchLogsData.LogEvents {
-	//	logEntry := LogEntry{LogGroup: logGroup, Timestamp: event.Timestamp, Message: event.Message}
-		logEntry := LogEntry{Timestamp: event.Timestamp, Message: event.Message}
+		logEntry := LogEntry{LogGroup: logGroup, Timestamp: event.Timestamp, Message: event.Message}
+	//	logEntry := LogEntry{Timestamp: event.Timestamp, Message: event.Message}
 		j, err := json.Marshal(logEntry)
 		if err != nil {
 			fmt.Println(err)
